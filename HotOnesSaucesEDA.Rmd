@@ -1,0 +1,144 @@
+---
+title: "HotOnesSauces"
+author: "Benjamin Robbins"
+date: "2023-11-06"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+library(skimr)
+library(visdat)
+library(plotly)
+
+library(corrplot)
+```
+
+## R Markdown
+
+```{r}
+data_dir <- 'data'
+target_file <- file.path(data_dir, 'sauces.zip')
+
+if (dir.exists(data_dir)) {
+  dir.create(data_dir)
+}
+
+if (!file.exists(target_file)) {
+  download.file('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv',
+                target_file)
+}
+```
+
+```{r}
+dataf <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv')
+```
+
+```{r}
+skim(dataf)
+```
+
+```{r}
+sauces <- tryCatch(
+  read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv'),
+  error = function(e) {
+    cat("Error:", conditionMessage(e), "\n")
+    sauces <- NULL
+  }
+)
+if (!is.null(sauces)) {
+  head(sauces)
+} else {
+  cat("Failed to load the 'sauces' dataset.\n")
+}
+head(sauces)
+```
+
+```{r}
+summary(sauces)
+```
+
+```{r}
+str(sauces)
+```
+
+```{r}
+summary(sauces$sauce_number, sauce_name, scoville)
+```
+
+```{r}
+summary(select(sauces, sauce_number, sauce_name, scoville))
+```
+
+```{r}
+scoville_column <- "scoville"
+```
+
+```{r}
+sauces$numeric_sauce_name <- as.numeric(factor(sauces$sauce_name))
+unique_values <- unique(sauces$numeric_sauce_name)
+print(unique_values)
+```
+
+```{r}
+if (scoville_column %in% names(sauces)) {
+  print("Column 'scoville' found in the dataset.")
+} else {
+  print("Column 'scoville' not found in the dataset.")
+}
+```
+
+```{r}
+correlation_matrix <- cor(select(sauces, numeric_sauce_name, scoville))
+corrplot(correlation_matrix, method = "color")
+```
+
+```{r}
+correlation_matrix <- cor(sauces[, c("numeric_sauce_name", "sauce_number")])
+print(correlation_matrix)
+```
+
+```{r}
+cross_tab <- table(sauces$season, sauces$sauce_name)
+print(cross_tab)
+mosaicplot(cross_tab, color = TRUE)
+```
+
+```{r}
+pairs(sauces[c("season", "sauce_number", "numeric_sauce_name")])
+```
+
+## Including Plots
+
+```{r}
+ggplot(sauces, aes(x = sauce_number)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+  labs(title = "Histogram of Sauce Number")
+```
+
+```{r}
+ggplot(sauces, aes(x = sauce_name)) +
+  geom_bar(fill = "green") +
+  labs(title = "Bar Plot of Sauce Name")
+```
+
+```{r}
+ggplot(sauces, aes(x = scoville)) +
+  geom_bar(fill = "orange") +
+  labs(title = "Scoville Ratings Distribution", x = "Scoville Rating") +
+  theme_minimal()
+```
+
+```{r}
+ggplot(sauces, aes(x = sauce_name, y = scoville)) +
+  geom_boxplot(fill = "purple") +
+  labs(title = "Box Plot of Scoville by Sauce Name")
+```
+
+```{r}
+ggplot(sauces, aes(x = sauce_name, y = sauce_number)) +
+  geom_point(color = "red") +
+  labs(title = "Scatterplot of Sauce Name vs. Sauce Number")
+```

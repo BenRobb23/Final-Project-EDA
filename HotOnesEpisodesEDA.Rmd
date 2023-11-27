@@ -1,0 +1,126 @@
+---
+title: "HotOnesEpisodesEDA"
+author: "Benjamin Robbins"
+date: "2023-11-05"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(skimr)
+library(visdat)
+library(plotly) 
+```
+
+## R Markdown
+
+```{r}
+data_dir <- 'data'
+target_file <- file.path(data_dir, 'episodes.zip')
+
+if (dir.exists(data_dir)) {
+  dir.create(data_dir)
+}
+
+if (!file.exists(target_file)) {
+  download.file ("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/episodes.csv" ,
+                target_file)            
+}
+```
+
+```{r}
+dataf <- read_csv ("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/episodes.csv")
+```
+
+```{r}
+skim(dataf)
+```
+
+
+```{r}
+str(dataf)
+```
+
+```{r}
+summary(dataf)
+```
+
+```{r}
+head(dataf)
+```
+
+```{r}
+custom_breaks <- as.Date(c("2023-01-01", "2023-03-01", "2023-05-01", "2023-07-01"))
+breaks = custom_breaks
+```
+
+```{r}
+hist(dataf$episode_season, main = "Episode Season Distribution", lab = "Episode Season")
+hist(dataf$season, main = "Season Distribution", lab = "Season")
+```
+
+```{r}
+min_date <- min(dataf$original_release)
+max_date <- max(dataf$original_release)
+custom_breaks <- seq(min_date, max_date, by = "1 day")
+hist(dataf$original_release, main = "Original Release Distribution", lab = "Original Release", breaks = custom_breaks)
+```
+
+```{r}
+dataf$original_release <- as.Date(dataf$original_release, format = "2023-01-01", "2023-03-01", "2023-05-01", "2023-07-01")
+```
+
+```{r}
+if ("another_date_variable" %in% colnames(dataf)) {
+  plot(dataf$original_release, dataf$another_date_variable, type = "l")
+} else {
+  print("Column 'another_date_variable' does not exist.")
+}
+```
+
+```{r}
+plot(dataf$original_release, dataf$another_date_variable, type = "l")
+```
+
+```{r}
+selected_columns <- dataf[, c("episode_season", "season", "original_release")]
+selected_columns <- sapply(selected_columns, as.numeric)
+cor_matrix <- cor(selected_columns)
+print(cor_matrix)
+```
+
+```{r}
+colnames(dataf)
+if ("episode_season" %in% colnames(data) && "season" %in% colnames(data) && "original_release" %in% colnames(data)) {
+  cor_data <- cor(data[, c("episode_season", "season", "original_release")])
+  print(cor_data)
+} else {
+  print("One or more of the specified columns does not exist in the dataset.")
+}
+```
+
+## Plots
+
+```{r}
+boxplot(dataf$episode_season ~ dataf$season)
+```
+
+```{r}
+barplot(table(dataf$title))
+```
+
+```{r}
+dataf$original_release <- as.Date(dataf$original_release)
+plot(dataf$original_release, dataf$episode_season, type = "l", main = "Time Series of Episode Season", xlab = "Original Release", ylab = "Episode Season")
+```
+
+
+
+```{r}
+png("hist_episode_season.png")
+hist(dataf$episode_season)
+dev.off()
+```
+
+
