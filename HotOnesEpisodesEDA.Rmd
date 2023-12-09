@@ -5,6 +5,9 @@ date: "2023-11-05"
 output: html_document
 ---
 
+ALL COMMENTS START WITH #DMC#
+
+# DMC# Necessary libraries are imported at the beginning, which is good for understanding dependencies.
 ```{r}
 library(tidyverse)
 library(lubridate)
@@ -14,52 +17,64 @@ library(plotly)
 ```
 
 ## R Markdown
-
+# DMC# Sets up data directory and target file path for data storage and retrieval.
 ```{r}
 data_dir <- 'data'
 target_file <- file.path(data_dir, 'episodes.zip')
 
+# DMC# Logical check for directory existence is reversed; should create directory if it does NOT exist.
 if (dir.exists(data_dir)) {
   dir.create(data_dir)
 }
 
+# DMC# Downloads the file if it doesn't exist, but there's no code to unzip 'episodes.zip' and read it.
 if (!file.exists(target_file)) {
   download.file ("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/episodes.csv" ,
                 target_file)            
 }
 ```
 
+# DMC# Directly reads CSV from the URL, ignoring the earlier code that seems to download the file.
 ```{r}
 dataf <- read_csv ("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/episodes.csv")
 ```
 
+#DMC# Good use of 'skim()' for an initial overview of the dataset.
 ```{r}
 skim(dataf)
 ```
 
-
+# DMC# Useful function to understand the structure of the data.
 ```{r}
 str(dataf)
 ```
 
+# DMC# Provides a summary of the data, helpful for basic statistics.
 ```{r}
 summary(dataf)
 ```
-
+# DMC# Displays the first few rows of the dataset, good for a quick visual check.
 ```{r}
 head(dataf)
 ```
 
+# DMC# Sets custom date breaks, but their purpose is not clear in this context.
 ```{r}
 custom_breaks <- as.Date(c("2023-01-01", "2023-03-01", "2023-05-01", "2023-07-01"))
 breaks = custom_breaks
 ```
 
+# DMC# Creates histograms, but 'lab' is not a valid argument for 'hist()'. Should be 'xlab' or 'ylab'. and I suggest putting the histograms separately for better visualization and with a brief explanation here. 
 ```{r}
-hist(dataf$episode_season, main = "Episode Season Distribution", lab = "Episode Season")
-hist(dataf$season, main = "Season Distribution", lab = "Season")
+hist(dataf$episode_season, main = "Episode Season Distribution", xlab = "Episode Season")
 ```
 
+# DMC# Brief explanation of the histogram here
+```{r}
+hist(dataf$season, main = "Season Distribution", xlab = "Season")
+```
+
+# DMC# Good use of dynamic date range for histogram breaks. Suggest add a brief explanation. 
 ```{r}
 min_date <- min(dataf$original_release)
 max_date <- max(dataf$original_release)
@@ -67,10 +82,15 @@ custom_breaks <- seq(min_date, max_date, by = "1 day")
 hist(dataf$original_release, main = "Original Release Distribution", lab = "Original Release", breaks = custom_breaks)
 ```
 
+# DMC# Incorrect use of 'as.Date' function; 'format' argument is misused. The presence of multiple dates here, separated by commas, is not a valid usage and would lead to an error in R. The format should be a single string that describes how the date is structured in the original_release column.
 ```{r}
 dataf$original_release <- as.Date(dataf$original_release, format = "2023-01-01", "2023-03-01", "2023-05-01", "2023-07-01")
+# DMC# Example of corrected use of 'as.Date'. The format should match the date format in 'original_release' column.
+# dataf$original_release <- as.Date(dataf$original_release, format = "%Y-%m-%d")
+
 ```
 
+# DMC# Conditional plotting based on column existence is a good practice. 
 ```{r}
 if ("another_date_variable" %in% colnames(dataf)) {
   plot(dataf$original_release, dataf$another_date_variable, type = "l")
@@ -79,17 +99,18 @@ if ("another_date_variable" %in% colnames(dataf)) {
 }
 ```
 
+# DMC# I suggest to add a label to the vertical exe and brief explanation of the plot. 
 ```{r}
 plot(dataf$original_release, dataf$another_date_variable, type = "l")
 ```
-
+# DMC# Transformation to numeric and correlation calculation is good, suggest brief explanation.
 ```{r}
 selected_columns <- dataf[, c("episode_season", "season", "original_release")]
 selected_columns <- sapply(selected_columns, as.numeric)
 cor_matrix <- cor(selected_columns)
 print(cor_matrix)
 ```
-
+# DMC# I am not sure about 'data', should be 'dataf'? But works good, so I think it's okay. 
 ```{r}
 colnames(dataf)
 if ("episode_season" %in% colnames(data) && "season" %in% colnames(data) && "original_release" %in% colnames(data)) {
@@ -101,22 +122,22 @@ if ("episode_season" %in% colnames(data) && "season" %in% colnames(data) && "ori
 ```
 
 ## Plots
-
+# DMC# I suggest add labels to X and Y exes. 
 ```{r}
 boxplot(dataf$episode_season ~ dataf$season)
 ```
-
+# DMC# Suggest adding labels for clarity.
 ```{r}
 barplot(table(dataf$title))
 ```
-
+# DMC# Great plot
 ```{r}
 dataf$original_release <- as.Date(dataf$original_release)
 plot(dataf$original_release, dataf$episode_season, type = "l", main = "Time Series of Episode Season", xlab = "Original Release", ylab = "Episode Season")
 ```
 
 
-
+# DMC# I suggest to delete this lane of code, it's okay for one use in the console, but doesn't apport anything to the EDA. pd: Great job! 
 ```{r}
 png("hist_episode_season.png")
 hist(dataf$episode_season)
