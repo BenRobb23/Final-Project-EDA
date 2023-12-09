@@ -5,11 +5,14 @@ date: "2023-11-06"
 output: html_document
 ---
 
+ALL COMMENTS START WITH #DMC#
+
+# DMC# I added "readr" library
 ```{r}
 library(tidyverse)
 library(lubridate)
-
-library(skimr)
+library(readr)
+library(skimr) 
 library(visdat)
 library(plotly)
 
@@ -32,6 +35,7 @@ if (!file.exists(target_file)) {
 }
 ```
 
+# Error because library readr was missing. I added it for reproduce the code.
 ```{r}
 dataf <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv')
 ```
@@ -71,11 +75,12 @@ summary(sauces$sauce_number, sauce_name, scoville)
 ```{r}
 summary(select(sauces, sauce_number, sauce_name, scoville))
 ```
-
+# DMC# I suggest to explain why you create this value. 
 ```{r}
 scoville_column <- "scoville"
 ```
 
+# DMC# Same, brief comment about what is this chunk of code. 
 ```{r}
 sauces$numeric_sauce_name <- as.numeric(factor(sauces$sauce_name))
 unique_values <- unique(sauces$numeric_sauce_name)
@@ -90,6 +95,7 @@ if (scoville_column %in% names(sauces)) {
 }
 ```
 
+# DMC# Rename variables for more clarity
 ```{r}
 correlation_matrix <- cor(select(sauces, numeric_sauce_name, scoville))
 corrplot(correlation_matrix, method = "color")
@@ -100,18 +106,20 @@ correlation_matrix <- cor(sauces[, c("numeric_sauce_name", "sauce_number")])
 print(correlation_matrix)
 ```
 
+# DMC# Brief comment, I don't know what you want to show, I am not familiar with this "plot"/cross tab
 ```{r}
 cross_tab <- table(sauces$season, sauces$sauce_name)
 print(cross_tab)
 mosaicplot(cross_tab, color = TRUE)
 ```
-
+# DMC# Brief comment
 ```{r}
 pairs(sauces[c("season", "sauce_number", "numeric_sauce_name")])
 ```
 
 ## Including Plots
 
+# DMC# Rename variables (delete "_"), it's just a small detail, it's looks good anyways. Do it for the rest of the plots. 
 ```{r}
 ggplot(sauces, aes(x = sauce_number)) +
   geom_histogram(binwidth = 5, fill = "blue", color = "black") +
