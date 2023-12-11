@@ -18,11 +18,14 @@ library(corrplot)
 
 ## R Markdown
 
+<!-- DH: Why is this a subsection, rather than a section?  Why is it titled "R Markdown"? -->
+
 ```{r}
 data_dir <- 'data'
 target_file <- file.path(data_dir, 'sauces.zip')
 
-if (dir.exists(data_dir)) {
+## DH: Missing negation means this creates the data folder only if it *already* exists
+if (!dir.exists(data_dir)) {
   dir.create(data_dir)
 }
 
@@ -33,14 +36,20 @@ if (!file.exists(target_file)) {
 ```
 
 ```{r}
+## DH: Since you just downloaded this, read the local copy
 dataf <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv')
 ```
+
+<!-- DH: What is this dataset?  Why are we looking at it?  What do we expect to find? -->
 
 ```{r}
 skim(dataf)
 ```
 
+<!-- DH: Anything notable here? -->
+
 ```{r}
+## DH: Why are we reading this again?  Why the complex error handling? 
 sauces <- tryCatch(
   read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv'),
   error = function(e) {
@@ -61,6 +70,7 @@ summary(sauces)
 ```
 
 ```{r}
+## DH: For EDA purposes, skim is way more informative
 str(sauces)
 ```
 
@@ -77,6 +87,7 @@ scoville_column <- "scoville"
 ```
 
 ```{r}
+## DH: Violates immutability
 sauces$numeric_sauce_name <- as.numeric(factor(sauces$sauce_name))
 unique_values <- unique(sauces$numeric_sauce_name)
 print(unique_values)
@@ -90,12 +101,17 @@ if (scoville_column %in% names(sauces)) {
 }
 ```
 
+<!-- DH: At this point, it seems like you skip most of Peng and Matsui's checklist, jumping down to "try the easy solution first" -->
+
 ```{r}
+## DH: If I understand it right, `numeric_sauce_name` is an alphabetic ranking of sauces.  Why would we expect this to be correlated with Scoville rating? 
+## DH: Use pipes rather than nested functions
 correlation_matrix <- cor(select(sauces, numeric_sauce_name, scoville))
 corrplot(correlation_matrix, method = "color")
 ```
 
 ```{r}
+## DH: Violates immutability; don't switch between base and tidyverse idioms
 correlation_matrix <- cor(sauces[, c("numeric_sauce_name", "sauce_number")])
 print(correlation_matrix)
 ```
@@ -106,29 +122,55 @@ print(cross_tab)
 mosaicplot(cross_tab, color = TRUE)
 ```
 
+<!-- DH: Either this is not a standard plot or something's gone wrong.  Give your reader/code reviewer some guidance on how to interpret it. Specifically, anything notable here? -->
+
 ```{r}
 pairs(sauces[c("season", "sauce_number", "numeric_sauce_name")])
 ```
 
 ## Including Plots
 
+<!-- DH: I don't understand what the section title means.  Why's it a subsection? -->
+
 ```{r}
+## DH: I don't understand why you made this plot.  Each value of `sauce_number` occurs 21 times, once per season. 
 ggplot(sauces, aes(x = sauce_number)) +
   geom_histogram(binwidth = 5, fill = "blue", color = "black") +
   labs(title = "Histogram of Sauce Number")
 ```
 
 ```{r}
+## DH: This one seems more informative, but it's too hard to read.  Variation below
 ggplot(sauces, aes(x = sauce_name)) +
   geom_bar(fill = "green") +
   labs(title = "Bar Plot of Sauce Name")
 ```
 
 ```{r}
+count(sauces, sauce_name) |> 
+    arrange(desc(n)) |> 
+    filter(n > 1) |> 
+    mutate(sauce_name = fct_inorder(sauce_name)) |> 
+    ggplot(aes(fct_rev(sauce_name), n)) +
+    geom_col() +
+    scale_y_continuous(breaks = scales::pretty_breaks()) +
+    coord_flip() +
+    labs(title = 'Sauces that are used in multiple seasons', 
+         x = 'sauce', 
+         y = 'seasons used')
+```
+
+<!-- DH: Anything notable here? -->
+
+```{r}
+## DH: More readable on a log scale + histogram
 ggplot(sauces, aes(x = scoville)) +
-  geom_bar(fill = "orange") +
-  labs(title = "Scoville Ratings Distribution", x = "Scoville Rating") +
-  theme_minimal()
+    # geom_bar(fill = "orange") +
+    geom_histogram(breaks = 10^(1:8), fill = 'orange') +
+    scale_x_log10() +
+    labs(title = "Scoville Ratings Distribution", 
+         x = "Scoville Rating") +
+    theme_minimal()
 ```
 
 ```{r}
@@ -137,8 +179,12 @@ ggplot(sauces, aes(x = sauce_name, y = scoville)) +
   labs(title = "Box Plot of Scoville by Sauce Name")
 ```
 
+<!-- DH: Anything notable here? -->
+
 ```{r}
 ggplot(sauces, aes(x = sauce_name, y = sauce_number)) +
   geom_point(color = "red") +
   labs(title = "Scatterplot of Sauce Name vs. Sauce Number")
 ```
+
+<!-- DH: Anything notable here? -->
