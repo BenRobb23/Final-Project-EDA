@@ -5,6 +5,8 @@ date: "2023-11-05"
 output: html_document
 ---
 
+<!-- DH: I looked at HotOnesSaucesEDA.Rmd before this one.  Many similar issues, so I'm only skimming and pointing out a few additional things. -->
+
 ```{r}
 library(tidyverse)
 library(lubridate)
@@ -68,10 +70,12 @@ hist(dataf$original_release, main = "Original Release Distribution", lab = "Orig
 ```
 
 ```{r}
+## DH: long line
 dataf$original_release <- as.Date(dataf$original_release, format = "2023-01-01", "2023-03-01", "2023-05-01", "2023-07-01")
 ```
 
 ```{r}
+## DH: ??
 if ("another_date_variable" %in% colnames(dataf)) {
   plot(dataf$original_release, dataf$another_date_variable, type = "l")
 } else {
@@ -92,6 +96,7 @@ print(cor_matrix)
 
 ```{r}
 colnames(dataf)
+## DH: Did you mean `dataf`?  `data` is a function
 if ("episode_season" %in% colnames(data) && "season" %in% colnames(data) && "original_release" %in% colnames(data)) {
   cor_data <- cor(data[, c("episode_season", "season", "original_release")])
   print(cor_data)
