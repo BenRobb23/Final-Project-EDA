@@ -1,0 +1,98 @@
+---
+title: "HotOnesEpisodes/SaucesEDA"
+author: "Benjamin Robbins"
+date: "2023-12-13"
+output: html_document
+---
+
+```{r setup}
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+library(skimr)
+library(corrplot)
+library(visdat)
+library(plotly)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r dataframes}
+# Load data from CSV files
+df1 <- read.csv("episodes.csv")
+df2 <- read.csv("sauces.csv")
+```
+
+```{r define column nams}
+# Define column names
+column_names_df1 <- c("Season", "Episode_Overall", "Episode_Season", "Title", "Original_Release", "Guest", "Guest_Appearance_Number", "Finished")
+column_names_df2 <- c("Season", "Sauce_Number", "Sauce_Name", "Scoville")
+```
+
+```{r column names}
+# Assign column names to dataframes
+colnames(df1) <- column_names_df1
+colnames(df2) <- column_names_df2
+```
+
+```{r explore sauces dataset}
+# Explore and analyze sauces dataset
+data_dir <- 'data'
+target_file <- file.path(data_dir, 'sauces.zip')
+```
+
+```{r explore episodes dataset}
+# Explore and analyze episodes dataset
+dataf <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/episodes.csv")
+```
+
+```{r merge datasets by season}
+# Merge data from both datasets
+merged_data <- merge(df1, df2, by.x = "Season", by.y = "Season")```
+```
+
+## Including Plots
+
+```{r Bar plot}
+# Bar plot of participants' completion levels
+ggplot(merged_data, aes(x = Finished)) +
+  geom_bar(fill = "purple") +
+  labs(title = "Participant Completion in 'Hot Ones' Show", x = "Completion Status", y = "Frequency") +
+  theme_minimal()
+```
+
+```{r Scatterplot}
+# Scatterplot matrix
+pairs(select(merged_data, Finished, Episode_Season, Scoville), cex = 0.7)
+```
+
+```{r Correlation}
+# Correlation heatmap
+correlation_matrix <- cor(select(merged_data, Finished, Episode_Season, Scoville))
+corrplot(correlation_matrix, method = "color")
+```
+
+```{r Boxplot}
+# Boxplot of spiciness by season
+ggplot(merged_data, aes(x = as.factor(Season), y = Scoville)) +
+  geom_boxplot(fill = "blue") +
+  labs(title = "Spiciness Distribution by Season", x = "Season", y = "Scoville")
+```
+
+```{r Violin plot}
+# Violin plot of ability to complete challenge vs. spiciness
+ggplot(merged_data, aes(x = Finished, y = Scoville)) +
+  geom_violin(fill = "green") +
+  labs(title = "Ability to Complete Challenge vs. Spiciness", x = "Ability to Complete Challenge", y = "Scoville")
+```
+
+```{r Time series plot}
+# Time series plot of spiciness and ability to complete challenge
+ggplot(merged_data, aes(x = Original_Release, y = Scoville, color = Finished)) +
+  geom_line() +
+  labs(title = "Time Series of Spiciness and Ability to Complete Challenge", x = "Original Release", y = "Spiciness Level", color = "Ability to Complete Challenge")
+```
