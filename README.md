@@ -53,14 +53,4 @@ Data Exploration and Visualization:
 
 Explore the merged dataset and create visualizations:
 
-  Box plot
-  Scatterplot matrix
-  
-  Correlation heatmap
-  
-  Boxplot of spiciness by season
-  
-  Violin plot of ability to complete challenge vs. spiciness
-  
-  Time series plot of spiciness and ability to complete challenge
-  
+  Box plot; Scatterplot matrix; Correlation heatmap; Boxplot of spiciness by season; Violin plot of ability to complete challenge vs. spiciness; Time series plot of spiciness and ability to complete challenge
